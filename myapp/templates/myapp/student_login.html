@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Student Login</title>
+  <!-- Add any necessary stylesheets or meta tags here -->
+  <style>
+    /* Add your styles here */
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+    }
+    .login-form {
+      margin-top: 50px;
+      display: inline-block;
+    }
+    .input-field {
+      margin-bottom: 15px;
+      width: 300px;
+      padding: 8px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    .submit-button {
+      padding: 10px 20px;
+      font-size: 18px;
+      border: 1px solid #333;
+      border-radius: 5px;
+      text-decoration: none;
+      color: #fff;
+      background-color: #007bff;
+      transition: background-color 0.3s ease;
+    }
+    .submit-button:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <h1>Student Login</h1>
+  <form class="login-form"  method="post">
+    {% csrf_token %}
+    <div>
+      <input type="text" name="username" placeholder="Enter Roll Number" class="input-field" required>
+    </div>
+    <div>
+      <input type="password" name="password" placeholder="Enter Password" class="input-field" required>
+    </div>
+    <div>
+      <input type="submit" value="Login" class="submit-button">
+    </div>
+  </form>
+</body>
+</html>

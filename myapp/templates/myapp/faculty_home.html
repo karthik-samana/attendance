@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Faculty Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<style>
+    /* Basic styles */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+}
+
+header {
+    background-color: #333;
+    color: #fff;
+    padding: 20px;
+    text-align: center;
+}
+
+main {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.options ul {
+    list-style: none;
+    padding: 0;
+}
+
+.options li {
+    margin-bottom: 10px;
+}
+
+.options a {
+    text-decoration: none;
+    color: #333;
+    padding: 8px 12px;
+    display: inline-block;
+    border-radius: 5px;
+    background-color: #f0f0f0;
+    transition: background-color 0.3s ease;
+}
+
+.options a:hover {
+    background-color: #ddd;
+}
+
+</style>
+<body>
+    <header>
+        <h1>Welcome to Faculty Dashboard</h1>
+    </header>
+    <main>
+        <section class="options">
+            <h2>Options:</h2>
+            <ul>
+                <li><a href="{% url 'take_attendance' %}">Take Attendance</a></li>
+                <li><a href="">View Reports</a></li>
+            </ul>
+        </section>
+    </main>
+    <script src="scripts.js"></script>
+</body>
+</html>

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Attendance Website</title>
+  <!-- Add any necessary stylesheets or meta tags here -->
+  <style>
+    /* Add your styles here */
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+    }
+    .login-buttons {
+      margin-top: 50px;
+    }
+    .login-button {
+      padding: 10px 20px;
+      font-size: 18px;
+      margin: 10px;
+      border: 1px solid #333;
+      border-radius: 5px;
+      text-decoration: none;
+      color: #333;
+      background-color: #f0f0f0;
+      transition: background-color 0.3s ease;
+    }
+    .login-button:hover {
+      background-color: #ddd;
+    }
+  </style>
+</head>
+<body>
+  <h1>Welcome to the Attendance Website</h1>
+  <div class="login-buttons">
+    <a href="{% url 'faculty_login' %}" class="login-button">Faculty Login</a>
+    <a href="{% url 'student_login' %}" class="login-button">Student Login</a>
+  </div>
+</body>
+</html>

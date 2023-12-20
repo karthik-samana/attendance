@@ -1,0 +1,81 @@
+<!-- location_page.html -->
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Location Page</title>
+    <script>
+        function getLocation() {
+            if (navigator.permissions) {
+                navigator.permissions.query({name:'geolocation'}).then(function(permissionStatus) {
+                    if (permissionStatus.state === 'granted') {
+                        getUserLocation();
+                    } else if (permissionStatus.state === 'prompt') {
+                        navigator.geolocation.getCurrentPosition(getUserLocation, handleError);
+                    } else if (permissionStatus.state === 'denied') {
+                        console.log('Geolocation permission denied by the user.');
+                    }
+                });
+            } else {
+                console.log('Geolocation API not supported in this browser.');
+            }
+        }
+
+        function getUserLocation() {
+            navigator.geolocation.getCurrentPosition(sendLocation, handleError);
+        }
+
+        function sendLocation(position) {
+            const latitude = position.coords.latitude;
+            const longitude = position.coords.longitude;
+
+            const xhr = new XMLHttpRequest();
+            xhr.open("POST", "/process_location", true);
+            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === XMLHttpRequest.DONE) {
+                    if (xhr.status === 200) {
+                        console.log("Location sent successfully!");
+                    } else {
+                        console.error("Error sending location.");
+                    }
+                }
+            };
+
+            const data = JSON.stringify({ "latitude": latitude, "longitude": longitude });
+            xhr.send(data);
+            var t=document.getElementById("latitude");
+             t.innerHTML=latitude;
+            var t1=document.getElementById("longitude");
+            t1.innerHTML=longitude;
+        }
+
+        function handleError(error) {
+            switch(error.code) {
+                case error.PERMISSION_DENIED:
+                    console.log("User denied the request for geolocation.");
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    console.log("Location information is unavailable.");
+                    break;
+                case error.TIMEOUT:
+                    console.log("The request to get user location timed out.");
+                    break;
+                case error.UNKNOWN_ERROR:
+                    console.log("An unknown error occurred.");
+                    break;
+            }
+        }
+    </script>
+</head>
+<body onload="getLocation()">
+    <!-- Content of your page -->
+    <div>
+        {{x}}
+        <p id="latitude"></p>
+
+            <p id="longitude"></p>
+    </div>
+</body>
+</html>

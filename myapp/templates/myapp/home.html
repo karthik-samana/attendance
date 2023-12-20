@@ -1,0 +1,17 @@
+{% load static %}
+
+<html>
+
+<head>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    
+</head>
+<body>
+<h1>home</h1>
+{{request.user}}
+<br>
+<br>
+<a href="{% url 'logout' %}" class="login-button">Logout</a>
+
+</body>
+</html>
