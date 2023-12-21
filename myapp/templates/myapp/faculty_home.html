@@ -55,7 +55,9 @@ main {
 </style>
 <body>
     <header>
-        <h1>Welcome to Faculty Dashboard</h1>
+        <h1>Welcome to Faculty Dashboard {{request.user}}</h1>
+        <h3><a href="{% url 'logout' %}">logout</a></h3>
+
     </header>
     <main>
         <section class="options">

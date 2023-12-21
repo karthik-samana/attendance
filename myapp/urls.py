@@ -11,5 +11,6 @@ urlpatterns = [
     path('faculty_home',views.faculty_home,name='faculty_home'),
     path('take_attendance',views.take_attendance,name='take_attendance'),
     path('process_location',views.process_location,name='process_location'),
+    path('student_attendance',views.student_attendance,name='student_attendance'),
 
 ]

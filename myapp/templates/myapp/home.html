@@ -9,6 +9,7 @@
 <body>
 <h1>home</h1>
 {{request.user}}
+<a href="{% url 'student_attendance' %}">Attendance</a>
 <br>
 <br>
 <a href="{% url 'logout' %}" class="login-button">Logout</a>

@@ -17,6 +17,8 @@ def allowed_user(allowed_roles=[]):
 def unauthorized_user(func):
     def wrapper(request,*args, **kwargs):
         if(request.user.is_authenticated):
+            if request.user.groups.all()[0].name=='faculty':
+                return redirect('faculty_home')
             return redirect('home')
         else:
             return func(request,*args, **kwargs)

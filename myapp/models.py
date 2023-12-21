@@ -28,4 +28,5 @@ def save_user_profile(sender, instance, **kwargs):
 class Temp(models.Model):
     longitude=models.CharField(max_length=10,null=True,blank=True)
     latitude=models.CharField(max_length=10,null=True,blank=True)
+    code=models.CharField(max_length=10,null=True,blank=True)
     
