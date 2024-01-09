@@ -10,7 +10,9 @@ def allowed_user(allowed_roles=[]):
             if group in allowed_roles:
                 return view_func(request,*args, **kwargs)
             else:
-                return HttpResponse("fuck")
+                if request.user.groups.all()[0].name=='faculty':
+                    return redirect('faculty_home')
+            return redirect('home')
         return wrapper
     return decorator
 

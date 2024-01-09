@@ -1,11 +1,13 @@
-<!-- location_page.html -->
-
 <!DOCTYPE html>
 <html>
 <head>
     <title>Location Page</title>
     <script>
         function getLocation() {
+            const x = document.getElementById("demo");
+            const longitudeInput = document.getElementById("longitude");
+            const latitudeInput = document.getElementById("latitude");
+
             if (navigator.permissions) {
                 navigator.permissions.query({name:'geolocation'}).then(function(permissionStatus) {
                     if (permissionStatus.state === 'granted') {
@@ -19,42 +21,43 @@
             } else {
                 console.log('Geolocation API not supported in this browser.');
             }
-        }
+            
+            function getUserLocation() {
+                navigator.geolocation.getCurrentPosition(sendLocation, handleError);
+            }
 
-        function getUserLocation() {
-            navigator.geolocation.getCurrentPosition(sendLocation, handleError);
-        }
+            function sendLocation(position) {
+                const latitude = position.coords.latitude;
+                const longitude = position.coords.longitude;
+                latitudeInput.value = latitude;
+                longitudeInput.value = longitude;
+                console.log(longitude, latitude);
+            }
 
-        function sendLocation(position) {
-            const latitude = position.coords.latitude;
-            const longitude = position.coords.longitude;
-            var t=document.getElementById("latitude");
-             t.value=latitude;
-            var t1=document.getElementById("longitude");
-            t1.value=longitude;
-            console.log(longitude,latitude)
-        }
-
-        function handleError(error) {
-            switch(error.code) {
-                case error.PERMISSION_DENIED:
-                    console.log("User denied the request for geolocation.");
-                    break;
-                case error.POSITION_UNAVAILABLE:
-                    console.log("Location information is unavailable.");
-                    break;
-                case error.TIMEOUT:
-                    console.log("The request to get user location timed out.");
-                    break;
-                case error.UNKNOWN_ERROR:
-                    console.log("An unknown error occurred.");
-                    break;
+            function handleError(error) {
+                switch(error.code) {
+                    case error.PERMISSION_DENIED:
+                        console.log("User denied the request for geolocation.");
+                        break;
+                    case error.POSITION_UNAVAILABLE:
+                        console.log("Location information is unavailable.");
+                        break;
+                    case error.TIMEOUT:
+                        console.log("The request to get user location timed out.");
+                        break;
+                    case error.UNKNOWN_ERROR:
+                        console.log("An unknown error occurred.");
+                        break;
+                }
             }
         }
+        <!-- Your HTML file -->
+
     </script>
 </head>
 <body onload="getLocation()">
     <!-- Content of your page -->
+    <h3 id='timer'></h3>
     <form method='POST'>
         {% csrf_token %}
         <input type="number" id="custId" name="code">
@@ -62,6 +65,6 @@
         <input type="hidden" id="latitude" name="latitude">   
         <input type="submit" value="submit"> 
     </form>
-
+    <p id="demo"></p>
 </body>
 </html>

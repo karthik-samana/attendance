@@ -13,4 +13,22 @@ from django.core.asgi import get_asgi_application
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Attendance.settings')
 
-application = get_asgi_application()
+
+# your_project_name/asgi.py
+
+from channels.routing import ProtocolTypeRouter, URLRouter
+from channels.auth import AuthMiddlewareStack
+from channels.routing import ProtocolTypeRouter, URLRouter
+import myapp.routing  # Import your routing configuration
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Attendance.settings')
+
+application = ProtocolTypeRouter({
+    "http": get_asgi_application(),  # Use Django's ASGI application for HTTP
+    "websocket": AuthMiddlewareStack(
+        URLRouter(
+            myapp.routing.websocket_urlpatterns  # Your WebSocket routing
+        )
+    ),
+})
+

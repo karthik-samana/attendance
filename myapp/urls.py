@@ -9,8 +9,10 @@ urlpatterns = [
     path('faculty_login',views.faculty_login,name='faculty_login'),
     path('logout',views.user_logout,name='logout'),
     path('faculty_home',views.faculty_home,name='faculty_home'),
-    path('take_attendance',views.take_attendance,name='take_attendance'),
-    path('process_location',views.process_location,name='process_location'),
+    path('class_selection',views.class_selection,name='class_selection'),
+    path('take_attendance/<str:sem>/<str:sec>',views.take_attendance,name='take_attendance'),
+    path('take_attendance_d/<str:sem>/<str:sec>',views.take_attendance_d,name='take_attendance_d'),
+    path('process_location/<str:sem>/<str:sec>',views.process_location,name='process_location'),
     path('student_attendance',views.student_attendance,name='student_attendance'),
-
+    path('grantAndrevoke/<str:x>/<str:t>',views.grantAndRevoke,name='grantAndRevoke'),
 ]

@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Attendance Table Update</title>
+    <!-- Bootstrap CSS CDN -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+
+<script>
+    function getLocation() {
+        if (navigator.permissions) {
+            navigator.permissions.query({name:'geolocation'}).then(function(permissionStatus) {
+                if (permissionStatus.state === 'granted') {
+                    getUserLocation();
+                } else if (permissionStatus.state === 'prompt') {
+                    navigator.geolocation.getCurrentPosition(getUserLocation, handleError);
+                } else if (permissionStatus.state === 'denied') {
+                    console.log('Geolocation permission denied by the user.');
+                }
+            });
+        } else {
+            console.log('Geolocation API not supported in this browser.');
+        }
+    }
+
+    function getUserLocation() {
+        navigator.geolocation.getCurrentPosition(sendLocation, handleError);
+    }
+
+    function sendLocation(position) {
+        const latitude = position.coords.latitude;
+        const longitude = position.coords.longitude;
+
+        const xhr = new XMLHttpRequest();
+        xhr.open("POST", "/process_location/{{sem}}/{{sec}}", true);
+        xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+                if (xhr.status === 200) {
+                    console.log("Location sent successfully!");
+                } else {
+                    console.error("Error sending location.");
+                }
+            }
+        };
+
+        const data = JSON.stringify({ "latitude": latitude, "longitude": longitude});
+        xhr.send(data);
+        
+        var t=document.getElementById("latitude");
+         t.innerHTML=latitude;
+        var t1=document.getElementById("longitude");
+        t1.innerHTML=longitude;
+    }
+
+    function handleError(error) {
+        switch(error.code) {
+            case error.PERMISSION_DENIED:
+                console.log("User denied the request for geolocation.");
+                break;
+            case error.POSITION_UNAVAILABLE:
+                console.log("Location information is unavailable.");
+                break;
+            case error.TIMEOUT:
+                console.log("The request to get user location timed out.");
+                break;
+            case error.UNKNOWN_ERROR:
+                console.log("An unknown error occurred.");
+                break;
+        }
+    }
+    function updateData() {
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+                if (xhr.status === 200) {
+                    var responseData = JSON.parse(xhr.responseText);
+                    updateTable(responseData.data);
+                } else {
+                    console.error("Failed to fetch updated data");
+                }
+            }
+        };
+        xhr.open('GET', '/take_attendance_d/{{ sem }}/{{ sec }}', true); // Replace with your endpoint
+        xhr.send();
+    }
+
+    function updateTable(data) {
+        var tableBody = document.getElementById("attendanceTableBody");
+        tableBody.innerHTML = ""; 
+        
+        data.forEach(function (item) {
+            var row = tableBody.insertRow();
+            row.setAttribute("id", "row_" + item.user);
+            var cell1 = row.insertCell(0);
+            var cell2 = row.insertCell(1);
+            cell2.setAttribute("id","status_"+item.user);
+            var cell3 = row.insertCell(2);
+
+            cell1.innerHTML = item.user; 
+            cell2.innerHTML = item.status ==true ? 'Attended' : 'Not Attended';
+
+            if (item.status === true) {
+                row.style.backgroundColor = '#00FA9A'; 
+            } else {
+                row.style.backgroundColor = '#FF6347'; 
+            }
+
+            if (item.status==true   ){
+            cell3.innerHTML = '<button id="' + item.user + '" onclick="callFunction(\'' + item.user + '\', \'R\')">Revoke</button>';
+            }else{
+                cell3.innerHTML = '<button id="' + item.user+ '"  onclick="callFunction(\'' + item.user + '\', \'G\')">Grant</button>';
+            }
+        });
+    }
+    updateData();
+
+var elapsedTime = 0;
+
+var intervalID = setInterval(function () {
+    updateData(); 
+    elapsedTime += 5; 
+
+    if (elapsedTime >= 20) {
+        clearInterval(intervalID); 
+    }
+}, 5000);
+ 
+
+
+    function callFunction(x,t) {
+        var url = "{% url 'grantAndRevoke' 0 1 %}".replace('1', t).replace('0', x);
+        console.log(url);
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', url, true);
+        xhr.send();
+        var element=document.getElementById("row_"+x);
+        var btn=document.getElementById(x);
+        var status=document.getElementById("status_"+x);
+        if(t==='G'){
+        element.style.backgroundColor='#00FA9A';
+        status.innerHTML="Attended";
+        btn.innerHTML="Revoke"
+        }
+        else{
+            element.style.backgroundColor='#FF6347';
+            status.innerHTML="Not Attended";
+            btn.innerHTML="Grant"
+        }
+
+    }
+
+    const expireTime = new Date("{{ expire_time|date:'Y-m-d\TH:i:s' }}").getTime();
+    console.log(expireTime)
+    // Update the countdown every 1 second
+    const timerInterval = setInterval(function() {
+        const now = new Date().getTime();
+        const distance = expireTime - now;
+
+        // Calculate remaining time in days, hours, minutes, and seconds
+       // const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+       // const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+        // Display the countdown timer
+        document.getElementById("timer").innerHTML = `Time Left:  ${minutes}m ${seconds}s`;//${days}d ${hours}h
+
+        // If the countdown is over, display a message
+        if (distance < 0) {
+            clearInterval(timerInterval);
+            document.getElementById("timer").innerHTML = "EXPIRED";
+        }
+    }, 1000); // Update every 1 second
+
+
+</script>
+<style>
+    #attended{
+        background-color:#00FA9A;
+    }
+</style>
+
+<body onload="getLocation()">
+
+    <div>
+        {{x}}
+        <p id="latitude"></p>
+
+            <p id="longitude"></p>
+    </div>
+    <div id="timer"></div>
+
+<div class="container mt-4">
+    <h2>Attendance Table</h2>
+    <table class="table table-bordered table-hover table:stripped bg-light">
+        <thead class="alert alert-success">
+            <tr>
+                <th>Roll Number</th>
+                <th>Status</th>
+                <th>Manually</th>
+            </tr>
+        </thead>
+        <tbody id="attendanceTableBody"></tbody>
+    </table>
+</div>
+</body>
+</html>

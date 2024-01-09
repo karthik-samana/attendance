@@ -1,10 +1,13 @@
 <!-- location_page.html -->
-
+{% load static %}
 <!DOCTYPE html>
 <html>
 <head>
     <title>Location Page</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.min.css' %}">
+	<script type="text/javascript" src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
     <script>
+        tr='True';
         function getLocation() {
             if (navigator.permissions) {
                 navigator.permissions.query({name:'geolocation'}).then(function(permissionStatus) {
@@ -30,7 +33,7 @@
             const longitude = position.coords.longitude;
 
             const xhr = new XMLHttpRequest();
-            xhr.open("POST", "/process_location", true);
+            xhr.open("POST", "/process_location/{{sem}}/{{sec}}", true);
             xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
 
             xhr.onreadystatechange = function () {
@@ -43,7 +46,7 @@
                 }
             };
 
-            const data = JSON.stringify({ "latitude": latitude, "longitude": longitude,"x":{{x}}});
+            const data = JSON.stringify({ "latitude": latitude, "longitude": longitude});
             xhr.send(data);
             
             var t=document.getElementById("latitude");
@@ -68,15 +71,64 @@
                     break;
             }
         }
+        function callFunction(x,t) {
+         
+            var url = "{% url 'grantAndRevoke' 0 1 %}".replace('1', t).replace('0', x);
+            console.log(url);
+
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', url, true);
+            xhr.send();
+        }
     </script>
+    <style>
+        #attended{
+            background-color:#00FA9A;
+        }
+    </style>
 </head>
 <body onload="getLocation()">
-    <!-- Content of your page -->
+    <meta http-equiv="refresh" content="5" />
     <div>
         {{x}}
         <p id="latitude"></p>
 
             <p id="longitude"></p>
     </div>
+
+    <div class="container mt-5">
+		<table class="table table-bordered table-hover table:stripped bg-light">
+			<thead class="alert alert-success">
+				<tr>
+				<th>Roll Number</th>
+				<th>Name</th>
+				<th>Status</th>
+				<th>Manually</th>
+				</tr>
+                <tbody> 
+                    {% for item in data %}
+                        <tr>
+                            {% if item.status is True %}
+                            <td id='attended'>{{ item.user.username }}</td>
+                            <td id='attended'>{{ item.user.first_name }}</td>
+                            <td id='attended'>Attended {{item.status}}</td>
+                            <td><button onclick="callFunction('{{ item.user.username }}','R')">Revoke</button></td>
+                            {% else %}
+                            <td>{{ item.user.username }}</td>
+                            <td>{{ item.user.first_name }}</td>
+                                <td> Not Attended</td>
+                            <td><button onclick="callFunction('{{ item.user.username }}','G')">Grant</button></td>
+
+                            {% endif %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+
+			</thead>
+			
+		</table>
+        
+	</div>
+
 </body>
 </html>

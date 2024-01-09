@@ -6,7 +6,20 @@
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     
 </head>
-<body>
+<body onload="getLocation()">
+    <script>
+        function getLocation() {
+            if (navigator.geolocation) {
+              navigator.geolocation.getCurrentPosition(showPosition);
+            } else { 
+              console.log("Geolocation is not supported by this browser.");
+            }
+          }
+          
+          function showPosition(position) {
+             console.log(position.coords.latitude,position.coords.longitude);
+          }
+    </script>
 <h1>home</h1>
 {{request.user}}
 <a href="{% url 'student_attendance' %}">Attendance</a>
