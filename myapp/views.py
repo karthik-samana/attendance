@@ -230,14 +230,17 @@ def student_attendance(request):
             long=float(x[0].get('longitude'))
             lati=float(x[0].get('latitude'))
             distance=calculate_distance(latitude,longitude,lati,long)
-            if distance<5:
+            if distance<8:
                 flag=Attendance.objects.filter(student=UserProfile.objects.get(user_id=request.user.id),class_attended=Class.objects.get(code=code))
                 print(flag.values())
                 if flag:
                     return HttpResponse("Your Attendace Already Recorded")
                 else:
-                    Attendance.objects.create(student=UserProfile.objects.get(user_id=request.user.id),class_attended=Class.objects.get(code=code),status=True)
-                    return HttpResponse("Your Attendance has been Recorded {0:2f} meters".format(distance))
+                    if(datetime.now()>x[0].get('expire')+timedelta(minutes=2,seconds=10)):
+                        return HttpResponse("Code Expired⏳")
+                    else:
+                        Attendance.objects.create(student=UserProfile.objects.get(user_id=request.user.id),class_attended=Class.objects.get(code=code),status=True)
+                        return HttpResponse("Your Attendance has been Recorded")
             else:
                 return HttpResponse("Go to class 😏")
         else:
@@ -248,8 +251,48 @@ def student_attendance(request):
 
 
 
-        
+
+def reports(request, code):
+    sem_sec = Class.objects.get(code=code)
+    sem, sec = sem_sec.class_id[0], sem_sec.class_id[1]
+    students = UserProfile.objects.filter(sem=sem, section=sec).order_by('user__username')
+    attendance_records = Attendance.objects.filter(class_attended__code=code, student__in=students)
     
+    present_students = {}
+    overall_students = {}
+
+    for student in students:
+        student_id = student.id
+        attendance_record = attendance_records.filter(student_id=student_id).first()
+        student_name = User.objects.get(username=student.user.username).first_name
+        
+        overall_students[student.user.username] = {'name': student_name, 'status': 'Absent'}
+
+        if attendance_record:
+            present_students[student.user.username] = {'name': student_name, 'status': 'Present'}
+            overall_students[student.user.username]['status'] = 'Present'
+
+    context = {
+        'present_students': present_students,
+        'overall_students': overall_students,
+    }
+    
+    return render(request, 'myapp/reports.html', context)
+    
+
+def view_reports(request):
+    classes_taught = Class.objects.filter(faculty_id=request.user.id).order_by('-date')
+
+    class_data = [
+        {'date': class_obj.date, 'sem': class_obj.class_id[0], 'section': class_obj.class_id[1],'code':class_obj.code}
+        for class_obj in classes_taught
+    ]
+
+
+    context = {'class_data': class_data}
+
+    return render(request, 'myapp/view_reports.html', context)
+
     
 
 

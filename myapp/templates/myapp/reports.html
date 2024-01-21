@@ -1,0 +1,150 @@
+<!-- reports.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendance Report</title>
+    <!-- Add Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .present-section, .absent-section, .overall-section {
+            display: none; /* Initially hide all sections */
+        }
+
+        .present-table, .absent-table, .overall-table {
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .present-table th, .overall-table th {
+            background-color: #28a745; /* Green background for table headers */
+            color: white;
+        }
+        .absent-table th{
+            background-color:#d22535;
+        }
+
+        .present-table td {
+            background-color: #d4edda; /* Light green background for table cells */
+        }
+        .absent-row {
+            background-color:#f8d7da !important;
+        }
+
+        .absent-table tr {
+            background-color: #f8d7da !important; /* Light red background for absent students */
+        }
+    </style>
+</head>
+<body>
+    <h1>Attendance Report</h1>
+
+    <!-- Toggle buttons for each section -->
+    <button onclick="toggleView('present')">Present Students</button>
+    <button onclick="toggleView('absent')">Absent Students</button>
+    <button onclick="toggleView('overall')">Overall Students</button>
+
+    <!-- Present Students Section -->
+    <div id="present-section" class="present-section">
+        <h2>Present Students:</h2>
+        <table class="table present-table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Username</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for username, data in present_students.items %}
+                    <tr>
+                        <td>{{ data.name }}</td>
+                        <td>{{ username }}</td>
+                        <td>{{ data.status }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Absent Students Section -->
+    <div id="absent-section" class="absent-section">
+        <h2>Absent Students:</h2>
+        <table class="table absent-table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Username</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for username, data in overall_students.items %}
+                    {% if data.status == 'Absent' %}
+                        <tr>
+                            <td>{{ data.name }}</td>
+                            <td>{{ username }}</td>
+                            <td>{{ data.status }}</td>
+                        </tr>
+                    {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Overall Students Section -->
+    <div id="overall-section" class="overall-section">
+        <h2>Overall Students:</h2>
+        <table class="table overall-table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Username</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for username, data in overall_students.items %}
+                <tr style="{% if data.status == 'Absent' %}background-color: #f8d7da;
+                    {% else %}
+                    background-color:#d4edda; ;
+                    {% endif %}">
+                    <td>{{ data.name }}</td>
+                    <td>{{ username }}</td>
+                    <td>{{ data.status }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        function toggleView(section) {
+            var presentSection = document.getElementById("present-section");
+            var absentSection = document.getElementById("absent-section");
+            var overallSection = document.getElementById("overall-section");
+
+            // Hide all sections
+            presentSection.style.display = "none";
+            absentSection.style.display = "none";
+            overallSection.style.display = "none";
+
+            // Show the selected section
+            if (section === 'present') {
+                presentSection.style.display = "block";
+            } else if (section === 'absent') {
+                absentSection.style.display = "block";
+            } else if (section === 'overall') {
+                overallSection.style.display = "block";
+            }
+        }
+    </script>
+
+    <!-- Add Bootstrap JS and jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.8/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

@@ -82,7 +82,7 @@
                 }
             }
         };
-        xhr.open('GET', '/take_attendance_d/{{ sem }}/{{ sec }}', true); // Replace with your endpoint
+        xhr.open('GET', '/take_attendance_d/{{ sem }}/{{ sec }}', true);
         xhr.send();
     }
 
@@ -122,7 +122,7 @@ var intervalID = setInterval(function () {
     updateData(); 
     elapsedTime += 5; 
 
-    if (elapsedTime >= 20) {
+    if (elapsedTime >= 100) {
         clearInterval(intervalID); 
     }
 }, 5000);
@@ -158,16 +158,14 @@ var intervalID = setInterval(function () {
         const now = new Date().getTime();
         const distance = expireTime - now;
 
-        // Calculate remaining time in days, hours, minutes, and seconds
        // const days = Math.floor(distance / (1000 * 60 * 60 * 24));
        // const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
         const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
         const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-        // Display the countdown timer
+
         document.getElementById("timer").innerHTML = `Time Left:  ${minutes}m ${seconds}s`;//${days}d ${hours}h
 
-        // If the countdown is over, display a message
         if (distance < 0) {
             clearInterval(timerInterval);
             document.getElementById("timer").innerHTML = "EXPIRED";

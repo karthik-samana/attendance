@@ -15,4 +15,6 @@ urlpatterns = [
     path('process_location/<str:sem>/<str:sec>',views.process_location,name='process_location'),
     path('student_attendance',views.student_attendance,name='student_attendance'),
     path('grantAndrevoke/<str:x>/<str:t>',views.grantAndRevoke,name='grantAndRevoke'),
+    path('reports/<str:code>',views.reports,name='reports'),
+    path('view_reports',views.view_reports),
 ]

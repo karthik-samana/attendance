@@ -1,0 +1,39 @@
+<!-- your_template.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Class Reports</title>
+    <!-- Add any additional styles or scripts if needed -->
+</head>
+<body>
+
+<h1>Class Reports</h1>
+
+{% if class_data %}
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Semester</th>
+                <th>Section</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for data in class_data %}
+                <tr>
+                    <td><a href="{% url 'reports' data.code %}">{{ data.date }}</a></td>
+                    <td>{{ data.sem }}</td>
+                    <td>{{ data.section }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p>No classes found.</p>
+{% endif %}
+
+</body>
+</html>
