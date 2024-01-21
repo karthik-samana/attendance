@@ -16,5 +16,5 @@ urlpatterns = [
     path('student_attendance',views.student_attendance,name='student_attendance'),
     path('grantAndrevoke/<str:x>/<str:t>',views.grantAndRevoke,name='grantAndRevoke'),
     path('reports/<str:code>',views.reports,name='reports'),
-    path('view_reports',views.view_reports),
+    path('view_reports',views.view_reports,name='view_reports'),
 ]
