@@ -51,5 +51,9 @@ class Attendance(models.Model):
     class_attended = models.ForeignKey(Class, on_delete=models.CASCADE)
     status = models.BooleanField()  # True for present, False for absent
     timestamp = models.DateTimeField(auto_now_add=True)
-
     
+class Hod_Attendance(models.Model):
+    student=models.ForeignKey(UserProfile,on_delete=models.CASCADE)
+    roll_number=models.CharField(max_length=10,null=True,blank=True)
+    date=models.DateField()
+    permission=models.CharField(max_length=100,null=True,blank=True)

@@ -17,4 +17,7 @@ urlpatterns = [
     path('grantAndrevoke/<str:x>/<str:t>',views.grantAndRevoke,name='grantAndRevoke'),
     path('reports/<str:code>',views.reports,name='reports'),
     path('view_reports',views.view_reports,name='view_reports'),
+    path('hod_page/', views.hod_page, name='hod_page'),
+    path('autocomplete_roll_number/', views.autocomplete_roll_number, name='autocomplete_roll_number'),
+    path('fetch_user_name/', views.fetch_user_name, name='fetch_user_name'),
 ]

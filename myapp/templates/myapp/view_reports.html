@@ -7,33 +7,96 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Class Reports</title>
     <!-- Add any additional styles or scripts if needed -->
+    <style>
+        .filter-dropdown {
+            margin-right: 10px;
+        }
+    </style>
 </head>
 <body>
 
 <h1>Class Reports</h1>
 
-{% if class_data %}
-    <table border="1">
-        <thead>
-            <tr>
-                <th>Date</th>
-                <th>Semester</th>
-                <th>Section</th>
+<!-- Semester Dropdown -->
+<select class="filter-dropdown" id="semesterFilter" onchange="filterClasses()">
+    <option value="">All Semesters</option>
+    <option value="1">Semester 1</option>
+    <option value="2">Semester 2</option>
+    <option value="3">Semester 3</option>
+    <option value="4">Semester 4</option>
+    <option value="5">Semester 5</option>
+    <option value="6">Semester 6</option>
+    <option value="7">Semester 7</option>
+    <option value="8">Semester 8</option>
+</select>
+
+<!-- Section Dropdown -->
+<select class="filter-dropdown" id="sectionFilter" onchange="filterClasses()">
+    <option value="">All Sections</option>
+    <option value="A">Section A</option>
+    <option value="B">Section B</option>
+    <option value="C">Section C</option>
+    <option value="D">Section D</option>
+</select>
+
+<!-- Date Range Input -->
+<label for="fromDateFilter">From:</label>
+<input type="date" id="fromDateFilter" onchange="filterClasses()">
+
+
+<label for="toDateFilter">To:</label>
+<input type="date" id="toDateFilter" onchange="filterClasses()">
+
+<table border="1">
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>Semester</th>
+            <th>Section</th>
+        </tr>
+    </thead>
+    <tbody id="classTableBody">
+        {% for data in class_data %}
+            <tr class="class-row">
+                <td><a href="{% url 'reports' data.code %}">{{ data.date }}</a></td>
+                <td>{{ data.sem }}</td>
+                <td>{{ data.section }}</td>
             </tr>
-        </thead>
-        <tbody>
-            {% for data in class_data %}
-                <tr>
-                    <td><a href="{% url 'reports' data.code %}">{{ data.date }}</a></td>
-                    <td>{{ data.sem }}</td>
-                    <td>{{ data.section }}</td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-{% else %}
-    <p>No classes found.</p>
-{% endif %}
+        {% endfor %}
+    </tbody>
+</table>
+
+<script>
+    function filterClasses() {
+        var semesterFilter = document.getElementById('semesterFilter').value.toLowerCase();
+        var sectionFilter = document.getElementById('sectionFilter').value.toLowerCase();
+        var fromDateFilter = document.getElementById('fromDateFilter').value;
+        var toDateFilter = document.getElementById('toDateFilter').value;
+
+        var rows = document.getElementsByClassName('class-row');
+    
+        d=new Date(fromDateFilter)
+        d.setDate(d.getDate() - 1);
+        for (var i = 0; i < rows.length; i++) {
+            var row = rows[i];
+            var semester = row.cells[1].innerText.toLowerCase();
+            var section = row.cells[2].innerText.toLowerCase();
+            var date = row.cells[0].innerText;
+
+            var semesterMatch = semesterFilter === '' || semester.includes(semesterFilter);
+            var sectionMatch = sectionFilter === '' || section.includes(sectionFilter);
+            var fromDateMatch = fromDateFilter === '' || new Date(date) >= d;
+            var toDateMatch = toDateFilter === '' || new Date(date) <= new Date(toDateFilter);
+    
+            if (semesterMatch && sectionMatch && fromDateMatch && toDateMatch) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        }
+    }
+    
+</script>
 
 </body>
 </html>

@@ -65,6 +65,9 @@ main {
             <ul>
                 <li><a href="{% url 'class_selection' %}">Take Attendance</a></li>
                 <li><a href="{% url 'view_reports' %}">View Reports</a></li>
+                {% if is_hod %}
+                 <li><a href="{% url 'hod_page' %}">Permission</a></li>
+                {% endif %}
             </ul>
         </section>
     </main>

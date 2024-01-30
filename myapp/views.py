@@ -8,7 +8,7 @@ from django.contrib.auth.decorators import login_required
 from .decorator import unauthorized_user,allowed_user
 from .models import UserProfile,Class,Attendance
 from .models import Temp
-from datetime import datetime,timedelta
+from datetime import datetime,timedelta,date
 from django.utils import timezone
 # Create your views here.
 
@@ -68,7 +68,8 @@ def user_logout(request):
 
 @allowed_user(['faculty'])
 def faculty_home(request):
-    return render(request,'myapp/faculty_home.html')
+    is_hod = request.user.groups.filter(name='hod').exists()
+    return render(request,'myapp/faculty_home.html',{'is_hod':is_hod})
 
 
 u_code=''
@@ -108,7 +109,12 @@ def class_selection(request):
 def take_attendance(request, sem, sec):
     expire_time=u_time+ timedelta(minutes=2)
     print(expire_time)
-    return render(request, 'myapp/dynamic_update.html', {'x': u_code,'sem':sem,'sec':sec,'expire_time':expire_time})
+    data=[]
+    d=Hod_Attendance.objects.filter(date=date.today()).values()
+    for i in d:
+        data.append({'roll_number':i.get('roll_number'),'reason':i.get('permission')})
+    
+    return render(request, 'myapp/dynamic_update.html', {'x': u_code,'sem':sem,'sec':sec,'expire_time':expire_time,'hod_attendance':data})
 
 
 
@@ -136,14 +142,22 @@ def take_attendance(request, sem, sec):
 
 from django.http import JsonResponse
 import json
-
+from .models import Hod_Attendance
+check_1=True
 @allowed_user(['faculty'])
 def take_attendance_d(request, sem, sec):
     q = UserProfile.objects.filter(sem=sem, section=sec).select_related('user').order_by('user__username')
     status = Attendance.objects.filter(class_attended_id='-1')
+    global check_1
     try:
         status = Attendance.objects.filter(class_attended_id=Class.objects.get(code=u_code))
+        d=Hod_Attendance.objects.filter(date=date.today()).values()
+        if check_1:
+            for i in d:
+                Attendance.objects.create(student=UserProfile.objects.get(user_id=i.get('student_id')),class_attended=Class.objects.get(code=u_code),status=True)
+            check_1=False
     except:
+        print("Faillllllllllll")
         pass
     data = []
     for i in q:
@@ -251,16 +265,19 @@ def student_attendance(request):
 
 
 
-
+@allowed_user(['faculty'])
 def reports(request, code):
+    global check_1
+    check_1=True
     sem_sec = Class.objects.get(code=code)
     sem, sec = sem_sec.class_id[0], sem_sec.class_id[1]
     students = UserProfile.objects.filter(sem=sem, section=sec).order_by('user__username')
     attendance_records = Attendance.objects.filter(class_attended__code=code, student__in=students)
-    
+    print(attendance_records.values())
     present_students = {}
     overall_students = {}
-
+    total_count=len(students)
+    present_count=0
     for student in students:
         student_id = student.id
         attendance_record = attendance_records.filter(student_id=student_id).first()
@@ -271,17 +288,21 @@ def reports(request, code):
         if attendance_record:
             present_students[student.user.username] = {'name': student_name, 'status': 'Present'}
             overall_students[student.user.username]['status'] = 'Present'
+            present_count+=1
 
     context = {
         'present_students': present_students,
         'overall_students': overall_students,
+        'present_count':present_count,
+        'total_count':total_count,
+        'absent_count':total_count-present_count
     }
     
     return render(request, 'myapp/reports.html', context)
     
-
+@allowed_user(['faculty'])
 def view_reports(request):
-    classes_taught = Class.objects.filter(faculty_id=request.user.id).order_by('-date')
+    classes_taught = Class.objects.filter(faculty_id=request.user.id).order_by('-id')
 
     class_data = [
         {'date': class_obj.date, 'sem': class_obj.class_id[0], 'section': class_obj.class_id[1],'code':class_obj.code}
@@ -294,8 +315,34 @@ def view_reports(request):
     return render(request, 'myapp/view_reports.html', context)
 
     
+from .models import Hod_Attendance
+def hod_page(request):
+    if request.method=='POST':
+        roll=request.POST.get('student_roll_number')
+        date=request.POST.get('date_of_permission')
+        permission=request.POST.get('reason')
+        student=UserProfile.objects.get(user_id=User.objects.get(username=roll))
+        x=Hod_Attendance.objects.filter(student=student,date=date)
+        if x:
+            return JsonResponse("Already Given",safe=False)
+        else:
+            Hod_Attendance.objects.create(student=student,roll_number=roll,date=date,permission=permission)
+        return JsonResponse("Recorded",safe=False)
+    return render(request,'myapp/hod_page.html')
+
+def autocomplete_roll_number(request):
+    term = request.GET.get('term')
+    usernames = User.objects.filter(username__icontains=term).values_list('username', flat=True)
+    return JsonResponse(list(usernames), safe=False)
 
 
 
-
+def fetch_user_name(request):
+    username = request.GET.get('username', '')
+    user = User.objects.filter(username=username).first()
+    
+    if user:
+        return JsonResponse({'first_name': user.first_name})
+    else:
+        return JsonResponse({'first_name': ''}) 
 

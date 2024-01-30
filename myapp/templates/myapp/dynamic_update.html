@@ -120,12 +120,12 @@ var elapsedTime = 0;
 
 var intervalID = setInterval(function () {
     updateData(); 
-    elapsedTime += 5; 
+    elapsedTime += 4; 
 
     if (elapsedTime >= 100) {
         clearInterval(intervalID); 
     }
-}, 5000);
+}, 1000);
  
 
 
@@ -170,7 +170,11 @@ var intervalID = setInterval(function () {
             clearInterval(timerInterval);
             document.getElementById("timer").innerHTML = "EXPIRED";
         }
-    }, 1000); // Update every 1 second
+    }, 1000); 
+
+    setTimeout(function () {
+        window.location.href = '/reports/{{x}}'; 
+    }, 2 * 60 * 1000);
 
 
 </script>

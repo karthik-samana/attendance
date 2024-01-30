@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'myapp',
     'django_extensions',
     'channels',
+    'django_template_maths'
 ]
 
 MIDDLEWARE = [
